@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Document</title>
+
+        <script src="https://code.jquery.com/jquery-3.6.0.slim.min.js" integrity="sha256-u7e5khyithlIdTpu22PHhENmPcRdFiHRjhAuHcs05RI=" crossorigin="anonymous"></script>
+    </head>
+
+    <body>
+        <a href="{% url 'home' %}">Home</a>
+
+        <!-- chart_name -->
+        <form action="" method="get">
+            <label for="chart_name">Chart Type</label>
+            <select name="chart_name" id="chart_name" onchange="$(this).closest('form').submit();">
+
+                <!-- bar -->
+                {% if 'bar' == default_chart_type %}
+                <option value="bar" selected>Bar Chart</option>
+                {% else %}
+                <option value="bar">Bar Chart</option>
+                {% endif %}
+
+                <!-- line -->
+                {% if 'line' == default_chart_type %}
+                <option value="line" selected>Line Chart</option>
+                {% else %}
+                <option value="line">Line Chart</option>
+                {% endif %}
+
+
+                <!-- polarArea -->
+                {% if 'polarArea' == default_chart_type %}
+                <option value="polarArea" selected>Area Chart</option>
+                {% else %}
+                <option value="polarArea">Area Chart</option>
+                {% endif %}
+
+                <!-- radar -->
+                {% if 'radar' == default_chart_type %}
+                <option value="radar" selected>Radar Chart</option>
+                {% else %}
+                <option value="radar">Radar Chart</option>
+                {% endif %}
+
+            </select>
+
+            <input type="hidden" name="chart_days" value="{{q_chart_days}}" >
+
+
+        </form>
+        <br>
+        <!-- chart_days -->
+        <div>
+            <form action="" method="get">
+                <label for="chart_days">Chart By Days</label>
+                <select name="chart_days" id="chart_days" onchange="$(this).closest('form').submit();">
+                    <option value="365">1 Year</option>
+
+                    {% if 1 == q_chart_days %}
+                    <option value="1" selected>1 Day</option>
+                    {% else %}
+                    <option value="1">1 Day</option>
+                    {% endif %}
+
+                    {% if 7 == q_chart_days %}
+                    <option value="7" selected>7 Day</option>
+                    {% else %}
+                    <option value="7">7 Day</option>
+                    {% endif %}
+
+                    {% if 30 == q_chart_days %}
+                    <option value="30" selected>1 Month</option>
+                    {% else %}
+                    <option value="30">1 Month</option>
+                    {% endif %}
+
+                    {% if 180 == q_chart_days %}
+                    <option value="180" selected>6 Month</option>
+                    {% else %}
+                    <option value="180">6 Month</option>
+                    {% endif %}
+                </select>
+
+                <input type="hidden" name="chart_name" value="{{default_chart_type}}">
+            </form>
+        </div>
+
+
+
+        <!-- CHART.JS -->
+        <div>
+            <canvas id="myChart"></canvas>
+        </div>
+        <!-- CHART.JS NPM CDN-->
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        {% autoescape off %}
+        <script>
+            // get backend data
+            var covidData = JSON.parse('{{ covid_data }}')
+            console.log(covidData)
+            var defaultChartType = '{{ default_chart_type }}'
+            console.log(defaultChartType)
+            var ctx = document.getElementById('myChart').getContext('2d');
+            var myChart = new Chart(ctx, {
+                type: defaultChartType, //'line'
+                data: {
+                    labels: covidData['date'], // X-axis
+
+                    datasets: [{
+                        label: 'active',
+                        data: covidData['active'],
+                        backgroundColor: "rgba(0, 0,0)",
+                        borderWidth: 1
+                    }, {
+                        label: 'confirmed',
+                        data: covidData['confirmed'],
+                        backgroundColor: "rgba(250, 250,0)",
+                        borderWidth: 1
+                    }, {
+                        label: 'deaths',
+                        data: covidData['deaths'],
+                        backgroundColor: "rgba(250, 0,0)",
+                        borderWidth: 1
+                    }, {
+                        label: 'recovered',
+                        data: covidData['recovered'],
+                        backgroundColor: "rgba(0, 250,0)",
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+
+        </script>
+        {% endautoescape %}
+
+
+        <!-- CHART.JS -->
+
+    </body>
+
+</html>
